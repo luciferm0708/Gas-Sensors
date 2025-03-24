@@ -1,4 +1,7 @@
+#include "CO2Sensor.h"
+
 #include <MQUnifiedsensor.h>
+
 
 #define Board "ESP-32"
 #define Pin_MQ5 34
@@ -9,9 +12,11 @@
 #define Pin_MQ136 35
 #define Type_MQ136 "MQ-136"
 #define RatioMQ136CleanAir 3.6
+#define Pin_CO2 32
 
 MQUnifiedsensor MQ5(Board, Voltage_Resolution, ADC_Bit_Resolution, Pin_MQ5, Type_MQ5);
 MQUnifiedsensor MQ136(Board, Voltage_Resolution, ADC_Bit_Resolution, Pin_MQ136, Type_MQ136);
+CO2Sensor co2Sensor (Pin_CO2, 0.99, 100);
 
 void setup() {
 
@@ -20,6 +25,7 @@ void setup() {
 
   MQ5_Calibration();
   MQ136_Calibration();
+  co2Sensor.calibrate();
 
 }
 
@@ -27,6 +33,8 @@ void loop() {
   displayMQ5();
   delay(500);
   displayMQ136();
+  delay(500);
+  displayCO2();
   delay(500);
 }
 
@@ -88,4 +96,13 @@ void displayMQ136() {
   Serial.print("MQ-136: ");
   Serial.print(MQ136.readSensor());
   Serial.println(" PPM");
+}
+
+void displayCO2() {
+  int ppm = co2Sensor.read();
+
+  Serial.print("CO2 Concentration: ");
+  Serial.print(ppm);
+  Serial.println("PPM");
+  delay(1000);
 }
